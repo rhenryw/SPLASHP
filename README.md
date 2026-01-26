@@ -16,6 +16,10 @@ This is a node.js proxy for super quick and easy deployment of SPLASH, if you wa
 HOW TO RUN:
 ---
 
+> [!IMPORTANT]  
+> Due to GitHub codespaces being stupid there *may* not be required node files so you might also have to run `npm init -y` in the `SPLASHP` directory before installing and running anything (right after cloning the repo). I will include it in the installation for now but it may become obsolete in the future.
+
+
 Make sure everything is up-to-date and install make sure Git and Node are installed
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -42,10 +46,13 @@ https://github.com/rhenryw/SPLASHP.git
 CD into the directory
 ```bash
 cd SPLASHP
+npm init -y
 ```
 
 Start the server (replace `main.js` with `main-tiny.js` if you want PURE node.
 ```bash
+npm i 
+npm i http-proxy
 sudo npm install -g pm2
 pm2 start main.js --name splash-proxy
 pm2 startup
