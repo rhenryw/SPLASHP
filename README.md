@@ -14,6 +14,23 @@ This is a node.js proxy for super quick and easy deployment of SPLASH, if you wa
 
 ---
 HOW TO INSTALL (one-click easy way)
+---
+
+> [!NOTE]  
+> This one liner was created with __AI Assistance__. It was put into ChatGPT with the __Human Created__ [deployWisp](https://github.com/rhenryw/deployWisp/blob/main/install.sh) script, and the __Human Created__ instructions below and told to make a similar script with the instructions below, than human-tested. This is to save time.
+
+
+Start with a clean Ubuntu/Debian Sever
+
+Point your domain/subdomain using an `A` record to your VPS (get IP using `hostname -i` if you don't know the IP)
+```bash
+curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s yourdomain.tld 
+```
+Replace `yourdomain.tld` with your domain/subdomain you want SPLASH to deploy on.
+Append `-c` to enable Certbot SSL certificates (if you don't proxy through cloudflare or if it doesn't provide SSL for you.
+Append `--tiny` to use main-tiny.js (pure Node, no http-proxy), which is good for older servers.
+
+If you don't want NGINX to automatically install, or if you aren't using debain, follow the detailed non-one-liner instructions below.
 
 ---
 HOW TO INSTALL (non one-liner):
