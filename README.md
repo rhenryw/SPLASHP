@@ -13,7 +13,10 @@ This is a node.js proxy for super quick and easy deployment of SPLASH, if you wa
 `main.js` uses `http-proxy` library, and therefore it must be installed with `npm i http-proxy`, whereas `main-tiny.js` is PURE node. However `main.js` is more powerful and generally reccomended over `main-tiny.js`, and `main-tiny.js` is just included for legacy system compatibility.
 
 ---
-HOW TO RUN:
+HOW TO INSTALL (one-click easy way)
+
+---
+HOW TO INSTALL (non one-liner):
 ---
 
 > [!IMPORTANT]  
