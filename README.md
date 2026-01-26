@@ -44,7 +44,7 @@ CD into the directory
 cd SPLASHP
 ```
 
-Start the server
+Start the server (replace `main.js` with `main-tiny.js` if you want PURE node.
 ```bash
 sudo npm install -g pm2
 pm2 start main.js --name splash-proxy
