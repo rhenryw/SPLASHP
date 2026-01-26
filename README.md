@@ -22,6 +22,8 @@ HOW TO RUN:
 
 Make sure everything is up-to-date and install make sure Git and Node are installed
 ```bash
+apt-get update
+apt-get install -y sudo
 sudo apt update && sudo apt upgrade -y
 sudo apt update
 sudo apt install -y git curl
