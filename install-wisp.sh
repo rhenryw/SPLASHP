@@ -104,7 +104,7 @@ sudo apt-get install -y caddy
 cd "$APP_DIR"
 npm init -y >/dev/null
 
-npm install http-proxy @mercuryworkshop/wisp-js/server
+npm install http-proxy @mercuryworkshop/wisp-js
 
 cat > main.js <<EOF
 const http = require("http");
