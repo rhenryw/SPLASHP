@@ -22,6 +22,8 @@ cat <<'BANNER'
 BANNER
 
 PORT=8080
+ASK_PORT=$((30000 + RANDOM % 20000))
+
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -112,6 +114,7 @@ const httpProxy = require("http-proxy");
 const { server: wisp, logging } = require("@mercuryworkshop/wisp-js/server");
 
 const PORT = $PORT;
+const ASK_PORT = $ASK_PORT;
 
 logging.set_level(logging.DEBUG);
 wisp.options.port_whitelist = [80, 443, [5000, 6000]];
@@ -124,8 +127,10 @@ const proxy = httpProxy.createProxyServer({
 
 proxy.on("error", (err, req, res) => {
   console.error("Proxy error:", err);
-  res.writeHead(502, { "Content-Type": "text/plain" });
-  res.end("Bad gateway");
+  if (res.writeHead) {
+    res.writeHead(502, { "Content-Type": "text/plain" });
+    res.end("Bad gateway");
+  }
 });
 
 const server = http.createServer((req, res) => {
@@ -145,9 +150,16 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Node proxy running on port ${PORT}`);
-  console.log(`- Proxying main site to https://splash.best`);
-  console.log(`- WISP server available at /wisp`);
+  console.log(\`Node proxy running on port \${PORT}\`);
+  console.log(\`- WISP available at /wisp\`);
+});
+
+http.createServer((req, res) => {
+  // Always allow (BYOD-friendly)
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("ok");
+}).listen(ASK_PORT, "127.0.0.1", () => {
+  console.log(\`Caddy ask endpoint listening on 127.0.0.1:\${ASK_PORT}\`);
 });
 EOF
 
@@ -160,10 +172,24 @@ pm2 save
 # Caddy config
 # -----------------------
 sudo tee /etc/caddy/Caddyfile > /dev/null <<EOF
-:80, :443 {
+{
+    on_demand_tls {
+        ask http://127.0.0.1:$ASK_PORT/ask
+    }
+}
+
+:443 {
+    tls {
+        on_demand
+    }
+    reverse_proxy 127.0.0.1:$PORT
+}
+
+:80 {
     reverse_proxy 127.0.0.1:$PORT
 }
 EOF
+
 
 sudo systemctl reload caddy
 
