@@ -27,9 +27,12 @@ Point your domain/subdomain using an `A` record to your VPS (get IP using `hostn
 curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s yourdomain.tld 
 ```
 Replace `yourdomain.tld` with your domain/subdomain you want SPLASH to deploy on.
-Append `-c` to enable Certbot SSL certificates (if you don't proxy through cloudflare or if it doesn't provide SSL for you.
-Append `--tiny` to use main-tiny.js (pure Node, no http-proxy), which is good for older servers.
-Append `--port {port}` to change the port that it will run at.
+
+- Append `-c` to enable Certbot SSL certificates (if you don't proxy through cloudflare or if it doesn't provide SSL for you.
+
+- Append `--tiny` to use main-tiny.js (pure Node, no http-proxy), which is good for older servers.
+
+- Append `--port {port}` to change the port that it will run at.
 
 If you don't want NGINX to automatically install, or if you aren't using debain, follow the detailed non-one-liner instructions below.
 
