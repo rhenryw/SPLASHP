@@ -63,11 +63,11 @@ echo "Mode:   $([[ $USE_TINY == true ]] && echo tiny || echo http-proxy)"
 # -----------------------
 # System dependencies
 # -----------------------
-apt-get update
-apt-get install -y sudo
-sudo apt update && sudo apt upgrade -y
-sudo apt update
-
+echo "Ensuring sudo is installed..."
+if ! command -v sudo >/dev/null; then
+  apt-get update
+  apt-get install -y sudo
+fi
 
 sudo apt-get update
 sudo apt-get install -y curl nginx openssl build-essential
