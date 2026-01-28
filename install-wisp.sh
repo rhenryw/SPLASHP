@@ -172,7 +172,7 @@ sudo systemctl reload caddy
 # -----------------------
 echo
 echo "========================================="
-echo "SPLASHP is live."
+echo "SPLASHP + wisp is live."
 echo "POINT DOMAIN TO: $SERVER_IP"
 echo "HTTPS handled automatically by Caddy." 
 echo "Internal port: $PORT"
