@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# SPLASHP one-liner installer
+# SPLASHP one-liner installer 
 # Usage:
-# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s -- [--port 8080]
+# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s -- [--tiny] [--port 8080]
+#   --tiny          Use main-tiny.js (pure Node, no http-proxy)
 #   --port {port}   Changes the port it runs at
 
 set -e
@@ -14,16 +15,21 @@ cat <<'BANNER'
 \ \___  \  \ \  _-/ \ \ \____  \ \  __ \  \ \___  \  \ \  __ \  \ \  _-/ 
  \/\_____\  \ \_\    \ \_____\  \ \_\ \_\  \/\_____\  \ \_\ \_\  \ \_\   
   \/_____/   \/_/     \/_____/   \/_/\/_/   \/_____/   \/_/\/_/   \/_/   by RHW
-                                                                           v0.4.0
- Now with WISP integration!
+                                                                           v0.3.3
+ Now with BYOD support!
  Secure Proxy for Live Audiovisual SHell Portable
 
 BANNER
 
+USE_TINY=false
 PORT=8080
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --tiny)
+      USE_TINY=true
+      shift
+      ;;
     --port)
       PORT="$2"
       shift 2
@@ -32,10 +38,12 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
   esac
- done
+done
 
-echo "Port: $PORT"
+echo "Port:   $PORT"
+echo "Mode:   $([[ $USE_TINY == true ]] && echo tiny || echo http-proxy)"
 SERVER_IP=$(hostname -I | awk '{print $1}')
+
 
 # -----------------------
 # System dependencies
@@ -46,20 +54,29 @@ if ! command -v sudo >/dev/null; then
   apt-get install -y sudo
 fi
 
+# -----------------------
+# Cleanup previous SPLASHP install
+# -----------------------
 APP_DIR="$HOME/splashp"
+
 if [ -d "$APP_DIR" ]; then
     echo "Cleaning up previous SPLASHP installation in $APP_DIR..."
-    rm -rf "$APP_DIR/main.js" "$APP_DIR/node_modules"
+    rm -rf "$APP_DIR/main.js" "$APP_DIR/main-tiny.js" "$APP_DIR/node_modules"
 fi
+
 mkdir -p "$APP_DIR"
 
 # -----------------------
-# Cleanup Caddy config
+# Cleanup previous SPLASHP Caddy config
 # -----------------------
 CADDYFILE="/etc/caddy/Caddyfile"
+
 if [ -f "$CADDYFILE" ]; then
     echo "Cleaning up previous SPLASHP Caddy configuration..."
+    # Backup original Caddyfile if not already backed up
     [ ! -f "${CADDYFILE}.bak" ] && sudo cp "$CADDYFILE" "${CADDYFILE}.bak"
+
+    # Remove only lines managed by SPLASHP (basic pattern matching)
     sudo sed -i '/reverse_proxy 127.0.0.1:[0-9]\+/d' "$CADDYFILE"
 fi
 
@@ -68,14 +85,23 @@ fi
 # -----------------------
 CADDY_KEY="/usr/share/keyrings/caddy-stable-archive-keyring.gpg"
 CADDY_LIST="/etc/apt/sources.list.d/caddy-stable.list"
-[ -f "$CADDY_KEY" ] && sudo rm -f "$CADDY_KEY"
-[ -f "$CADDY_LIST" ] && sudo rm -f "$CADDY_LIST"
+
+if [ -f "$CADDY_KEY" ]; then
+    echo "Removing old Caddy GPG key..."
+    sudo rm -f "$CADDY_KEY"
+fi
+
+if [ -f "$CADDY_LIST" ]; then
+    echo "Removing old Caddy sources list..."
+    sudo rm -f "$CADDY_LIST"
+fi
+
 
 sudo apt-get update
 sudo apt-get install -y curl openssl build-essential
 
 # -----------------------
-# Install Node.js LTS
+# Install Node.js (LTS)
 # -----------------------
 echo "Installing Node.js (LTS)..."
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
@@ -98,22 +124,66 @@ sudo apt-get update
 sudo apt-get install -y caddy
 
 # -----------------------
-# Setup Node app
+# App directory
 # -----------------------
+APP_DIR="$HOME/splashp"
+mkdir -p "$APP_DIR"
 cd "$APP_DIR"
+
 npm init -y >/dev/null
 
-npm install http-proxy @mercuryworkshop/wisp-js/server
+# -----------------------
+# Write JS proxy
+# -----------------------
+if [[ "$USE_TINY" == true ]]; then
+  echo "Writing main-tiny.js..."
 
-cat > main.js <<EOF
+  cat > main-tiny.js <<EOF
 const http = require("http");
-const httpProxy = require("http-proxy");
-const { server: wisp, logging } = require("@mercuryworkshop/wisp-js/server");
+const https = require("https");
 
+const TARGET_HOST = "splash.best";
 const PORT = $PORT;
 
-logging.set_level(logging.DEBUG);
-wisp.options.port_whitelist = [80, 443, [5000, 6000]];
+http.createServer((req, res) => {
+  const proxyReq = https.request({
+    hostname: TARGET_HOST,
+    path: req.url,
+    method: req.method,
+    headers: {
+      ...req.headers,
+      host: TARGET_HOST,
+    },
+  }, proxyRes => {
+    res.writeHead(proxyRes.statusCode, proxyRes.headers);
+    proxyRes.pipe(res);
+  });
+
+  req.pipe(proxyReq);
+
+  proxyReq.on("error", err => {
+    console.error(err);
+    res.writeHead(502);
+    res.end("Bad gateway");
+  });
+}).listen(PORT, () => {
+  console.log(`SPLASHP running on http://localhost:${PORT} -> https://splash.best`);
+});
+EOF
+
+  APP_FILE="main-tiny.js"
+
+else
+  echo "Installing http-proxy..."
+  npm install http-proxy
+
+  echo "Writing main.js..."
+
+  cat > main.js <<EOF
+const http = require("http");
+const httpProxy = require("http-proxy");
+
+const PORT = $PORT;
 
 const proxy = httpProxy.createProxyServer({
   target: "https://splash.best",
@@ -127,37 +197,29 @@ proxy.on("error", (err, req, res) => {
   res.end("Bad gateway");
 });
 
-const server = http.createServer((req, res) => {
-  if (req.url.startsWith("/wisp")) {
-    wisp.routeRequest(req, res);
-  } else {
-    proxy.web(req, res);
-  }
-});
-
-server.on("upgrade", (req, socket, head) => {
-  if (req.url.startsWith("/wisp")) {
-    wisp.routeRequest(req, socket, head);
-  } else {
-    proxy.ws(req, socket, head);
-  }
-});
-
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Node proxy running on port ${PORT}`);
-  console.log(`- Proxying main site to https://splash.best`);
-  console.log(`- WISP server available at /wisp`);
+http.createServer((req, res) => {
+  proxy.web(req, res);
+}).listen(PORT, () => {
+  console.log(`SPLASHP running on http://localhost:${PORT} -> https://splash.best`);
 });
 EOF
 
+  APP_FILE="main.js"
+fi
+
+# -----------------------
+# pm2 stuff that might not work because I don't usually use pm2
+# -----------------------
 pm2 delete splashp-proxy >/dev/null 2>&1 || true
-pm2 start main.js --name splashp-proxy
+pm2 start "$APP_FILE" --name splashp-proxy
 pm2 startup systemd -u "$USER" --hp "$HOME"
 pm2 save
 
 # -----------------------
-# Caddy config
+# Caddy config (ANY domain)
 # -----------------------
+echo "Configuring Caddy..."
+
 sudo tee /etc/caddy/Caddyfile > /dev/null <<EOF
 :80, :443 {
     reverse_proxy 127.0.0.1:$PORT
@@ -173,8 +235,7 @@ echo
 echo "========================================="
 echo "SPLASHP is live."
 echo "POINT DOMAIN TO: $SERVER_IP"
-echo "HTTPS handled automatically by Caddy." 
+echo "HTTPS will be automatic."
 echo "Internal port: $PORT"
 echo "pm2 process: splashp-proxy"
-echo "WISP available at /wisp"
 echo "========================================="
