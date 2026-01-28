@@ -67,6 +67,8 @@ apt-get update
 apt-get install -y sudo
 sudo apt update && sudo apt upgrade -y
 sudo apt update
+
+
 sudo apt-get update
 sudo apt-get install -y curl nginx openssl build-essential
 
