@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# SPLASHP one-liner installer
+# SPLASHP one-liner installer 
 # Usage:
-# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s yourdomain.tld [-c] [--tiny] [--port 8080]
-#   -c              Enable Certbot SSL
+# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash [--tiny] [--port 8080]
 #   --tiny          Use main-tiny.js (pure Node, no http-proxy)
 #   --port {port}   Changes the port it runs at
 
@@ -16,24 +15,17 @@ cat <<'BANNER'
 \ \___  \  \ \  _-/ \ \ \____  \ \  __ \  \ \___  \  \ \  __ \  \ \  _-/ 
  \/\_____\  \ \_\    \ \_____\  \ \_\ \_\  \/\_____\  \ \_\ \_\  \ \_\   
   \/_____/   \/_/     \/_____/   \/_/\/_/   \/_____/   \/_/\/_/   \/_/   by RHW
-                                                                           v0.2.0
-
+                                                                           v0.3.3
+ Now with BYOD support!
  Secure Proxy for Live Audiovisual SHell Portable
 
 BANNER
 
-SSL_ENABLED=false
 USE_TINY=false
-DOMAIN=""
 PORT=8080
-
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -c)
-      SSL_ENABLED=true
-      shift
-      ;;
     --tiny)
       USE_TINY=true
       shift
@@ -43,22 +35,15 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     *)
-      if [[ -z "$DOMAIN" ]]; then
-        DOMAIN="$1"
-      fi
       shift
       ;;
   esac
 done
 
-if [[ -z "$DOMAIN" ]]; then
-  echo "Error: Domain not provided."
-  exit 1
-fi
-
-echo "Domain: $DOMAIN"
 echo "Port:   $PORT"
 echo "Mode:   $([[ $USE_TINY == true ]] && echo tiny || echo http-proxy)"
+SERVER_IP=$(hostname -I | awk '{print $1}')
+
 
 # -----------------------
 # System dependencies
@@ -70,14 +55,30 @@ if ! command -v sudo >/dev/null; then
 fi
 
 sudo apt-get update
-sudo apt-get install -y curl nginx openssl build-essential
+sudo apt-get install -y curl openssl build-essential
 
+# -----------------------
+# Install Node.js (LTS)
+# -----------------------
 echo "Installing Node.js (LTS)..."
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
+# -----------------------
+# Install pm2
+# -----------------------
 echo "Installing pm2..."
 sudo npm install -g pm2
+
+# -----------------------
+# Install Caddy
+# -----------------------
+echo "Installing Caddy..."
+sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt-get update
+sudo apt-get install -y caddy
 
 # -----------------------
 # App directory
@@ -123,7 +124,7 @@ http.createServer((req, res) => {
     res.end("Bad gateway");
   });
 }).listen(PORT, () => {
-  console.log(\`SPLASHP running on http://localhost:\${PORT} -> https://splash.best\`);
+  console.log(`SPLASHP running on http://localhost:${PORT} -> https://splash.best`);
 });
 EOF
 
@@ -156,7 +157,7 @@ proxy.on("error", (err, req, res) => {
 http.createServer((req, res) => {
   proxy.web(req, res);
 }).listen(PORT, () => {
-  console.log(\`SPLASHP running on http://localhost:\${PORT} -> https://splash.best\`);
+  console.log(`SPLASHP running on http://localhost:${PORT} -> https://splash.best`);
 });
 EOF
 
@@ -172,43 +173,26 @@ pm2 startup systemd -u "$USER" --hp "$HOME"
 pm2 save
 
 # -----------------------
-# nginx rahh!!!
+# Caddy config (ANY domain)
 # -----------------------
-echo "Configuring NGINX..."
+echo "Configuring Caddy..."
 
-sudo tee /etc/nginx/sites-available/splashp.conf > /dev/null <<EOF
-server {
-    listen 80;
-    server_name $DOMAIN;
-
-    location / {
-        proxy_pass http://127.0.0.1:$PORT;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-    }
+sudo tee /etc/caddy/Caddyfile > /dev/null <<EOF
+:80, :443 {
+    reverse_proxy 127.0.0.1:$PORT
 }
 EOF
 
-sudo ln -sf /etc/nginx/sites-available/splashp.conf /etc/nginx/sites-enabled/splashp.conf
-sudo rm -f /etc/nginx/sites-enabled/default
-
-sudo nginx -t
-sudo systemctl restart nginx
+sudo systemctl reload caddy
 
 # -----------------------
-# SSL *yawn*
+# Done
 # -----------------------
-if [[ "$SSL_ENABLED" == true ]]; then
-  sudo apt-get install -y certbot python3-certbot-nginx
-  sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m certs@rhw.one --redirect
-fi
-
 echo
 echo "========================================="
-echo "SPLASHP is live at:"
-echo "  $([[ $SSL_ENABLED == true ]] && echo https || echo http)://$DOMAIN"
+echo "SPLASHP is live."
+echo "POINT DOMAIN TO: $SERVER_IP"
+echo "HTTPS will be automatic."
 echo "Internal port: $PORT"
 echo "pm2 process: splashp-proxy"
 echo "========================================="
