@@ -17,7 +17,7 @@ HOW TO INSTALL (one-click easy way)
 ---
 
 > [!NOTE]  
-> This one liner was created with __AI Assistance__. It was put into ChatGPT with the __Human Created__ [deployWisp](https://github.com/rhenryw/deployWisp/blob/main/install.sh) script, and the __Human Created__ instructions below and told to make a similar script with the instructions below, than human-tested. This is to save time.
+> This one liner was created with __AI Assistance__. It was put into ChatGPT with the __Human Created__ [deployWisp](https://github.com/rhenryw/deployWisp/blob/main/install.sh) script, and the __Human Created__ instructions below and told to make a similar script with the instructions below, than human-edited and finally human-tested. This is to save time.
 
 
 Start with a clean Ubuntu/Debian Sever
