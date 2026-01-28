@@ -43,7 +43,7 @@ HOW TO INSTALL (non one-liner):
 ---
 
 > [!NOTE]  
-> This version does not set up NGINX nor SSL Certificates via certbot. This JUST runs the proxy sever and cannot be connected to via a domain without further setup. Use the one-liner above if you want to set everything up automatically.
+> This version does not set up NGINX nor SSL Certificates via certbot. This JUST runs the proxy sever and cannot be connected to via a domain without further setup (look up how to, it's not my job to teach you how to set up an NGINX server). Use the one-liner above if you want to set everything up automatically.
 
 
 Make sure everything is up-to-date and install make sure Git and Node are installed
@@ -67,7 +67,7 @@ npm -v
 Install this repo
 
 ```bash
-https://github.com/rhenryw/SPLASHP.git
+git clone https://github.com/rhenryw/SPLASHP.git
 ```
 (or your preffered method of Git installation)
 
@@ -76,6 +76,8 @@ CD into the directory
 cd SPLASHP
 npm init -y
 ```
+
+Why `npm init -y`? This repo is NOT a full project, rather a skeleton so YOU can deploy your own with your own config. It just has JS and the install shell, that's it.
 
 Start the server (replace `main.js` with `main-tiny.js` if you want PURE node.
 ```bash
