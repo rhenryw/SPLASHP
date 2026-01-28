@@ -2,6 +2,7 @@
 Secure Proxy for Live Audiovisual SHell (SPLASH) Portable 
 A CLI-themed reverse proxy for easy VPS deployment
 
+### Now with BYOD Support
 
 See [main repo](https://github.com/rhenryw/SPLASH)
 
@@ -31,13 +32,10 @@ Start with a clean Ubuntu/Debian Srever
 
 Point your domain/subdomain using an `A` record to your VPS (get IP using `hostname -i` if you don't know the IP)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s yourdomain.tld 
+curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash 
 ```
-Replace `yourdomain.tld` with your domain/subdomain you want SPLASH to deploy on.
-
-- Append `-c` to enable Certbot SSL certificates (if you don't proxy through cloudflare or if it doesn't provide SSL for you.)
 > [!IMPORTANT]  
-> If you are using Cloudflare and not using Certbot or the `-c` flag, make sure the `A` record is set to `proxied` (shows a little orange cloud with an arrow through it) and your SSL/TLS setting is set to "Flexible"
+> If you are using Cloudflare, make sure the `A` record is set to `proxied` (shows a little orange cloud with an arrow through it) and your SSL/TLS setting is set to "Flexible"
 
 - Append `--tiny` to use main-tiny.js (pure Node, no http-proxy), which is good for older servers.
 
@@ -50,7 +48,7 @@ HOW TO INSTALL (non one-liner):
 ---
 
 > [!NOTE]  
-> This version does not set up NGINX nor SSL Certificates via certbot. This JUST runs the proxy sever and cannot be connected to via a domain without further setup (look up how to, it's not my job to teach you how to set up an NGINX server). Use the one-liner above if you want to set everything up automatically.
+> This version does not set up Caddy nor SSL Certificates via certbot. This JUST runs the proxy sever and cannot be connected to via a domain without further setup (look up how to, it's not my job to teach you how to set up an NGINX server). Use the one-liner above if you want to set everything up automatically.
 
 
 Make sure everything is up-to-date and install make sure Git and Node are installed
