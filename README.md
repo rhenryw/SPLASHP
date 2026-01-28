@@ -21,7 +21,7 @@ This is a node.js proxy for super quick and easy deployment of SPLASH, if you wa
 `main.js` uses `http-proxy` library, and therefore it must be installed with `npm i http-proxy`, whereas `main-tiny.js` is PURE node. However `main.js` is more powerful and generally recommended over `main-tiny.js`, and `main-tiny.js` is just included for legacy system compatibility.
 
 ---
-HOW TO INSTALL (one-click easy way)
+HOW TO INSTALL PROXY ONLY (one-click easy way)
 ---
 
 > [!NOTE]  
@@ -41,7 +41,22 @@ curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | b
 
 - Append `--port {port}` to change the port that it will run at.
 
-If you don't want NGINX to automatically install, or if you aren't using debain, follow the detailed non-one-liner instructions below.
+---
+HOW TO INSTALL PROXY + WISP (one-click easy way)
+---
+
+Start with a clean Ubuntu/Debian Srever
+
+Point your domain/subdomain using an `A` record to your VPS (get IP using `hostname -i` if you don't know the IP)
+```bash
+curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install-wisp.sh | bash -s --
+```
+> [!IMPORTANT]  
+> If you are using Cloudflare, make sure the `A` record is set to `proxied` (shows a little orange cloud with an arrow through it) and your SSL/TLS setting is set to "Flexible"
+
+- Append `--port {port}` to change the port that it will run at.
+
+This will create a proxy instance AND a wisp server at `wss://domain.tld/wisp/`
 
 ---
 HOW TO INSTALL (non one-liner):
