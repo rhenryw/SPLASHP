@@ -43,7 +43,7 @@ HOW TO INSTALL (non one-liner):
 ---
 
 > [!NOTE]  
-> This is NOT a complete NPM project. Just code. So the `npm init -y` instructions are crucial. Just make sure you either use the one-liner or follow the intructions exactly.
+> This version does not set up NGINX nor SSL Certificates via certbot. This JUST runs the proxy sever and cannot be connected to via a domain without further setup. Use the one-liner above if you want to set everything up automatically.
 
 
 Make sure everything is up-to-date and install make sure Git and Node are installed
