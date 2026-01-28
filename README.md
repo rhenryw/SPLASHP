@@ -32,7 +32,7 @@ Start with a clean Ubuntu/Debian Srever
 
 Point your domain/subdomain using an `A` record to your VPS (get IP using `hostname -i` if you don't know the IP)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash 
+curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s --
 ```
 > [!IMPORTANT]  
 > If you are using Cloudflare, make sure the `A` record is set to `proxied` (shows a little orange cloud with an arrow through it) and your SSL/TLS setting is set to "Flexible"
