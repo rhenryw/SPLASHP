@@ -15,7 +15,7 @@ cat <<'BANNER'
 \ \___  \  \ \  _-/ \ \ \____  \ \  __ \  \ \___  \  \ \  __ \  \ \  _-/ 
  \/\_____\  \ \_\    \ \_____\  \ \_\ \_\  \/\_____\  \ \_\ \_\  \ \_\   
   \/_____/   \/_/     \/_____/   \/_/\/_/   \/_____/   \/_/\/_/   \/_/   by RHW
-                                                                           v0.4.0
+                                                                           v0.4.4
  Now with WISP integration!
  Secure Proxy for Live Audiovisual SHell Portable
 
@@ -38,6 +38,7 @@ while [[ $# -gt 0 ]]; do
  done
 
 echo "Port: $PORT"
+echo "BYOD Ask port: $ASK_PORT"
 SERVER_IP=$(hostname -I | awk '{print $1}')
 
 # -----------------------
