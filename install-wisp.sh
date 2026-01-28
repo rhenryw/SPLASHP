@@ -3,7 +3,7 @@
 # SPLASHP + wisp one-liner installer 
 # this version also installs a wisp server at /wisp/
 # Usage:
-# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s -- [--port 8080]
+# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install-wisp.sh | bash -s -- [--port 8080]
 #   --port {port}   Changes the port it runs at
 
 set -e
