@@ -2,7 +2,7 @@
 
 # SPLASHP one-liner installer 
 # Usage:
-# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash [--tiny] [--port 8080]
+# curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | bash -s -- [--tiny] [--port 8080]
 #   --tiny          Use main-tiny.js (pure Node, no http-proxy)
 #   --port {port}   Changes the port it runs at
 
