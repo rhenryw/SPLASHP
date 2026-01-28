@@ -54,6 +54,49 @@ if ! command -v sudo >/dev/null; then
   apt-get install -y sudo
 fi
 
+# -----------------------
+# Cleanup previous SPLASHP install
+# -----------------------
+APP_DIR="$HOME/splashp"
+
+if [ -d "$APP_DIR" ]; then
+    echo "Cleaning up previous SPLASHP installation in $APP_DIR..."
+    rm -rf "$APP_DIR/main.js" "$APP_DIR/main-tiny.js" "$APP_DIR/node_modules"
+fi
+
+mkdir -p "$APP_DIR"
+
+# -----------------------
+# Cleanup previous SPLASHP Caddy config
+# -----------------------
+CADDYFILE="/etc/caddy/Caddyfile"
+
+if [ -f "$CADDYFILE" ]; then
+    echo "Cleaning up previous SPLASHP Caddy configuration..."
+    # Backup original Caddyfile if not already backed up
+    [ ! -f "${CADDYFILE}.bak" ] && sudo cp "$CADDYFILE" "${CADDYFILE}.bak"
+
+    # Remove only lines managed by SPLASHP (basic pattern matching)
+    sudo sed -i '/reverse_proxy 127.0.0.1:[0-9]\+/d' "$CADDYFILE"
+fi
+
+# -----------------------
+# Cleanup Caddy GPG and source list
+# -----------------------
+CADDY_KEY="/usr/share/keyrings/caddy-stable-archive-keyring.gpg"
+CADDY_LIST="/etc/apt/sources.list.d/caddy-stable.list"
+
+if [ -f "$CADDY_KEY" ]; then
+    echo "Removing old Caddy GPG key..."
+    sudo rm -f "$CADDY_KEY"
+fi
+
+if [ -f "$CADDY_LIST" ]; then
+    echo "Removing old Caddy sources list..."
+    sudo rm -f "$CADDY_LIST"
+fi
+
+
 sudo apt-get update
 sudo apt-get install -y curl openssl build-essential
 
