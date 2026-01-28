@@ -28,7 +28,9 @@ curl -fsSL https://raw.githubusercontent.com/rhenryw/SPLASHP/main/install.sh | b
 ```
 Replace `yourdomain.tld` with your domain/subdomain you want SPLASH to deploy on.
 
-- Append `-c` to enable Certbot SSL certificates (if you don't proxy through cloudflare or if it doesn't provide SSL for you. If you are using Cloudflare make sure the `A` record is set to `proxied` (shows a little orange cloud with an arrow through it) and your SSL/TLS setting is set to "Flexible")
+- Append `-c` to enable Certbot SSL certificates (if you don't proxy through cloudflare or if it doesn't provide SSL for you.)
+> [!IMPORTANT]  
+> If you are using Cloudflare and not using Certbot or the `-c` flag, make sure the `A` record is set to `proxied` (shows a little orange cloud with an arrow through it) and your SSL/TLS setting is set to "Flexible"
 
 - Append `--tiny` to use main-tiny.js (pure Node, no http-proxy), which is good for older servers.
 
