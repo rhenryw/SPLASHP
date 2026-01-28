@@ -42,8 +42,8 @@ If you don't want NGINX to automatically install, or if you aren't using debain,
 HOW TO INSTALL (non one-liner):
 ---
 
-> [!IMPORTANT]  
-> Due to GitHub codespaces being stupid there *may* not be required node files so you might also have to run `npm init -y` in the `SPLASHP` directory before installing and running anything (right after cloning the repo). I will include it in the installation for now but it may become obsolete in the future.
+> [!NOTE]  
+> This is NOT a complete NPM project. Just code. So the `npm init -y` instructions are crucial. Just make sure you either use the one-liner or follow the intructions exactly.
 
 
 Make sure everything is up-to-date and install make sure Git and Node are installed
