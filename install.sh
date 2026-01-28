@@ -202,7 +202,7 @@ sudo systemctl restart nginx
 # -----------------------
 if [[ "$SSL_ENABLED" == true ]]; then
   sudo apt-get install -y certbot python3-certbot-nginx
-  sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m admin@$DOMAIN --redirect
+  sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m me@rhw.one --redirect
 fi
 
 echo
