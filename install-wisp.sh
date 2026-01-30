@@ -118,7 +118,7 @@ const PORT = $PORT;
 const ASK_PORT = $ASK_PORT;
 
 logging.set_level(logging.DEBUG);
-wisp.options.port_whitelist = [80, 443, [5000, 6000]];
+wisp.options.port_whitelist = undefined;
 
 const proxy = httpProxy.createProxyServer({
   target: "https://splash.best",
