@@ -187,10 +187,9 @@ sudo tee /etc/caddy/Caddyfile > /dev/null <<EOF
 }
 
 :80 {
-    redir https://{host}{uri} permanent
+    reverse_proxy 127.0.0.1:$PORT
 }
 EOF
-
 
 
 sudo systemctl reload caddy
